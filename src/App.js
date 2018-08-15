@@ -4,63 +4,109 @@ import Titles from "./components/Titles";
 
 import Form from "./components/Form";
 
-import Weather from "./components/Weather";
-
-const API_KEY = "896b489b6630e668023fc637406ff867";
+import Message from "./components/Message";
 
 class App extends React.Component {
-  state = {
-    temparture: undefined,
-    city: undefined,
-    country: undefined,
-    humidity: undefined,
-    description: undefined,
-    error: undefined
-  };
-    getWeather = async (e) => {
-      e.preventDefault();
-      const city = e.target.elements.city.value;
-      const country =e.target.elements.country.value;
-      const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`);
-      const data = await api_call.json();
+  constructor(props){
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      error: undefined
+    };
+    this.updateLogin=this.updateLogin.bind(this);
+    //this.getLoginInfo=this.getLoginInfo.bind(this);
+  }
+
+
+  updateLogin(u, p) {
+    console.log(u+p);
+    this.setState({
+      username: u,
+      password: p
+    });
+  }
+  signIn = async (e) => {
+    e.preventDefault();
+    //console.log(e.target.value);
+    const username = this.state.username;
+    const password = this.state.password;
+    console.log(`htrd`+username);
+    console.log(password);
+    if ("" === "Sign-in"){
+      console.log(`htrd ${username}`);
+      console.log(password);
+      const user = await fetch(`http://localhost:8080/login?username=${username}&password=${password}`);
+      console.log(user);
+      const data = await user.json();
       console.log(data);
-      if(city && country){
-        this.setState({
-          temparture: data.main.temp,
-          city: data.name,
-          country: data.sys.country,
-          humidity: data.main.humidity,
-          description: data.weather[0].description,
-          error: ""
-        });
-      } else {
+      if(username){
+        if(data){
+          this.setState({
+            error: "I have logged in!"
+          });
+        }else{
+          this.setState({
+            error: "Login information is incorrect."
+          });
+        }
+      } else{
         this.setState ({
-          //temparture: undefined,
-          //city: undefined,
-          //country: undefined,
-          //humidity: undefined,
-          //description: undefined,
-          error: "Please enter the value."
+          error: "Please enter a Username"
         });
       }
-    };
-
-    render(){
-        return (
-            <div>
-                <Titles />
-                <Form getWeather={this.getWeather}/>
-                <Weather
-                  temparture={this.state.temparture}
-                  city={this.state.city}
-                  country={this.state.country}
-                  humidity={this.state.humidity}
-                  description={this.state.description}
-                  error={this.state.error}
-                />
-            </div>
-        );
     }
+  }
+
+  signUp = async (e) => {
+    e.preventDefault();
+    const username = this.state.username;
+    const password = this.state.password;
+    console.log(username);
+    console.log(password);
+    const stringy = JSON.stringify({"username":username,"password":password});
+    const user = await fetch(`http://localhost:8080/signup`, {
+      method: 'POST',
+      body: stringy,
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    });
+    const data =  await user.json();
+    console.log(data);
+  }
+
+  updateUsername = (event) =>{
+    this.setState({
+      username: event.target.value
+    });
+  }
+  updatePassword = (event) => {
+    this.setState({
+      password: event.target.value
+    });
+  }
+
+  handleLogin = (event) =>  {
+    event.preventDefault();
+    this.props.setLogin(this.state.username,this.state.password);
+    this.props.getLoginInfo();
+  }
+
+  render(){
+      return (
+          <div>
+              <Titles />
+              <Form
+                updateUsername={this.updateUsername}
+                updatePassword={this.updatePassword}
+                signIn={this.signIn}
+                signUp={this.signUp}/>
+              <Message
+                error={this.state.error} />
+          </div>
+      );
+  }
 }
 
 export default App;
