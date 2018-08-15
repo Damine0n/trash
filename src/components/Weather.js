@@ -9,5 +9,4 @@ const Weather = props => (
     {props.error && <p>{props.error}</p>}
   </div>
 );
-
 export default Weather;

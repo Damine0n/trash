@@ -6,9 +6,12 @@ import Form from "./components/Form";
 
 import Weather from "./components/Weather";
 
+import Client from "./components/Client";
+
 const API_KEY = "896b489b6630e668023fc637406ff867";
 
 class App extends React.Component {
+
   state = {
     temparture: undefined,
     city: undefined,
@@ -17,20 +20,22 @@ class App extends React.Component {
     description: undefined,
     error: undefined
   };
-    getWeather = async (e) => {
+    getLoginInfo = async (e) => {
       e.preventDefault();
-      const city = e.target.elements.city.value;
-      const country =e.target.elements.country.value;
-      const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`);
+      const username = e.target.elements.username.value;
+      const password = e.target.elements.password.value;
+      const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${username},${password}&appid=${API_KEY}&units=metric`);
+      const user = await fetch('http:"//localhost:8080/login?username=${username}&password=${password}');
       const data = await api_call.json();
       console.log(data);
-      if(city && country){
+      console.log(user);
+      if(username && password){
         this.setState({
-          temparture: data.main.temp,
-          city: data.name,
-          country: data.sys.country,
-          humidity: data.main.humidity,
-          description: data.weather[0].description,
+          temparture: 'aewrt',
+          city: 'wetrq',
+          country: 'qtre',
+          humidity: 'wer',
+          description: 'aerg',
           error: ""
         });
       } else {
@@ -40,7 +45,7 @@ class App extends React.Component {
           //country: undefined,
           //humidity: undefined,
           //description: undefined,
-          error: "Please enter the value."
+          error: "Please enter a Username"
         });
       }
     };
@@ -49,7 +54,7 @@ class App extends React.Component {
         return (
             <div>
                 <Titles />
-                <Form getWeather={this.getWeather}/>
+                <Form getLoginInfo={this.getLoginInfo}/>
                 <Weather
                   temparture={this.state.temparture}
                   city={this.state.city}
